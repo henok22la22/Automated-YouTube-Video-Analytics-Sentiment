@@ -1,0 +1,893 @@
+{
+  "name": "Youtube Report",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -820,
+        -40
+      ],
+      "id": "fb22837c-f933-4721-a5b0-083650de8c58",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "content": "## Get All Videos from the channel - Posted in this Week.",
+        "height": 340,
+        "width": 440
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -600,
+        -200
+      ],
+      "id": "85e78ad9-38f6-4ac6-8c4e-800bab35896d",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Get Statistics\n##  for each video.",
+        "height": 340,
+        "width": 520
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -140,
+        -200
+      ],
+      "id": "d89476c2-5db7-4a28-95f7-00c47c430744",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Get Top 20 Comments ",
+        "height": 340,
+        "width": 460
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        420,
+        40
+      ],
+      "id": "823bc70d-4913-4e93-bb1a-e409d9e0b60c",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/youtube/v3/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "AIzaSyA1sCWYpyvCFZ3VcE0nFqcXoxIEfvmhsjI"
+            },
+            {
+              "name": "channelId",
+              "value": "UCzo3jVzn-Z9LrFVwAE7iDbw"
+            },
+            {
+              "name": "part",
+              "value": "snippet"
+            },
+            {
+              "name": "order",
+              "value": "date"
+            },
+            {
+              "name": "maxResults",
+              "value": "10"
+            },
+            {
+              "name": "publishedAfter",
+              "value": "2025-06-19T00:00:00Z"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -520,
+        -40
+      ],
+      "id": "d1082226-bcc7-46b7-aaba-3253c9109ec4",
+      "name": "HTTP Channel"
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/youtube/v3/videos",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "part",
+              "value": "snippet,statistics,contentDetails"
+            },
+            {
+              "name": "id",
+              "value": "={{ $json.id.videoId }}"
+            },
+            {
+              "name": "key",
+              "value": "AIzaSyA1sCWYpyvCFZ3VcE0nFqcXoxIEfvmhsjI"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -40,
+        -40
+      ],
+      "id": "6f7c725d-ed9a-42c1-98f9-f4d4808717df",
+      "name": "HTTP Video"
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/youtube/v3/commentThreads",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "part",
+              "value": "snippet"
+            },
+            {
+              "name": "videoId",
+              "value": "={{ $json.items[0].id }}"
+            },
+            {
+              "name": "maxResults",
+              "value": "20"
+            },
+            {
+              "name": "order",
+              "value": "relevance"
+            },
+            {
+              "name": "key",
+              "value": "AIzaSyA1sCWYpyvCFZ3VcE0nFqcXoxIEfvmhsjI"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        220
+      ],
+      "id": "5910210d-6ee9-435b-a88b-872e93eee7be",
+      "name": "HTTP Comment"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "items",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -300,
+        -40
+      ],
+      "id": "1f993667-23ca-4740-87da-5647ae8bfdc8",
+      "name": "Split Out - Videos"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "items",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        700,
+        220
+      ],
+      "id": "529aef25-dec0-4ff5-bf95-eb5a78128f63",
+      "name": "Split Out - Comments"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        320
+      ],
+      "id": "4b0cd811-0b00-4211-8ff5-882117a86954",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "O9JnYaKDGegHbNo7",
+          "name": "OpenAi account After bugs"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.snippet.topLevelComment.snippet.textDisplay }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Classify the sentiment of the following text as Positive, Negative, or Neutral. Output only one value in this exact JSON format:\n{\"sentiment\": \"Positive\"}\n"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        980,
+        100
+      ],
+      "id": "059eafea-8c81-4619-86ff-7ccd488650d1",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\"sentiment\": \"Positive\"}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        1140,
+        300
+      ],
+      "id": "a02ffe67-da3b-4b98-8ca6-0d5c6f5c7ad7",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        180,
+        -40
+      ],
+      "id": "06596934-5305-41f0-aa9a-09fe475af62e",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "content": "## Sentiment Analysis (positive,Negative,Neutral) for each comment ",
+        "height": 460,
+        "width": 460
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        900,
+        -20
+      ],
+      "id": "79bec9ab-43b2-4cfe-9bf6-69617a47850f",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Store Sentiment in Google sheet for extra analysis.",
+        "height": 480,
+        "width": 460
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1380,
+        -20
+      ],
+      "id": "51665325-3407-4bb4-be2d-e7ec8545df4e",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const videoStats = {};\n\nfor (const item of items) {\n  const videoID = item.json.VideoID;\n  const sentiment = item.json.Sentiment;\n  const videoTitle = item.json[\"Video Title\"];\n  const viewCount = item.json.ViewCount;\n  const likeCount = item.json.LikeCount;\n  const commentCount = item.json.CommentCount;\n\n  if (!videoStats[videoID]) {\n    videoStats[videoID] = {\n      VideoID: videoID,\n      Title: videoTitle || 'Untitled',\n      ViewCount: viewCount || 0,\n      LikeCount: likeCount || 0,\n      CommentCount: commentCount || 0,\n      Positive: 0,\n      Negative: 0,\n      Neutral: 0,\n      Total: 0,\n    };\n  }\n\n  if (sentiment === 'Positive') videoStats[videoID].Positive++;\n  else if (sentiment === 'Negative') videoStats[videoID].Negative++;\n  else if (sentiment === 'Neutral') videoStats[videoID].Neutral++;\n\n  videoStats[videoID].Total++;\n}\n\n// Format final results\nconst results = Object.values(videoStats).map(video => {\n  const total = video.Total;\n  return {\n    json: {\n      VideoID: video.VideoID,\n      Title: video.Title,\n      ViewCount: video.ViewCount,\n      LikeCount: video.LikeCount,\n      CommentCount: video.CommentCount,\n      Positive: video.Positive,\n      Negative: video.Negative,\n      Neutral: video.Neutral,\n      Total: total,\n      PositivePercent: ((video.Positive / total) * 100).toFixed(2),\n      NegativePercent: ((video.Negative / total) * 100).toFixed(2),\n      NeutralPercent: ((video.Neutral / total) * 100).toFixed(2),\n    }\n  };\n});\n\nreturn results;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        760,
+        -220
+      ],
+      "id": "51b7fb5e-ea23-4719-9410-73f4380863d4",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "content": "## Percentage analysis and Chart per Video",
+        "height": 300,
+        "width": 760
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        700,
+        -340
+      ],
+      "id": "b9133146-03f5-444d-80bd-861235ae4b38",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const title = item.json.Title || \"Untitled\";\n  const views = item.json.ViewCount || 0;\n  const likes = item.json.LikeCount || 0;\n  const comments = item.json.CommentCount || 0;\n  const totalFeedback = item.json.Total || 0;\n\n  const chartConfig = {\n    type: \"bar\",\n    data: {\n      labels: [title],\n      datasets: [\n        {\n          label: \"Positive\",\n          backgroundColor: \"green\",\n          data: [item.json.Positive],\n        },\n        {\n          label: \"Negative\",\n          backgroundColor: \"red\",\n          data: [item.json.Negative],\n        },\n        {\n          label: \"Neutral\",\n          backgroundColor: \"gray\",\n          data: [item.json.Neutral],\n        }\n      ]\n    },\n    options: {\n      title: {\n        display: true,\n        text: `🎬 ${title}\\n👁️ ${views} views | 👍 ${likes} likes | 💬 ${comments} comments | 💡 ${totalFeedback} analyzed`\n      },\n      plugins: {\n        legend: { position: 'top' },\n        title: {\n          display: true,\n          text: `Sentiment for \"${title}\"`,\n        }\n      }\n    }\n  };\n\n  const chartUrl = `https://quickchart.io/chart?c=${encodeURIComponent(JSON.stringify(chartConfig))}`;\n\n  return {\n    json: {\n      ...item.json,\n      chartUrl,\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        -220
+      ],
+      "id": "36e02f58-a7a7-43b7-8155-1670cb648eea",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "url": "={{$json.chartUrl}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1200,
+        -220
+      ],
+      "id": "0f8051fe-c3d1-4f36-8c2b-9b8f7013dd08",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "1225369361",
+        "file": "={{ $json.chartUrl }} ",
+        "additionalFields": {
+          "caption": "Here the report for this week"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1520,
+        -220
+      ],
+      "id": "42b5ac95-08de-440f-9e3d-3cdc18789a71",
+      "name": "Telegram",
+      "webhookId": "9e454ac1-3457-4afd-b2c5-8eb5ef458fd4",
+      "credentials": {
+        "telegramApi": {
+          "id": "dIgmz8cvdIubd5JV",
+          "name": "Telegram account Dating"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Store video Statistics, Like,comment,view... ",
+        "height": 300,
+        "width": 260
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        120,
+        -520
+      ],
+      "id": "c9bcda33-1aad-4920-b25f-84916fc93eaf",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1_M67__2kGBUAjr9Cx6UEMkIk5xBNSqGnPI1IyLAdj3o",
+          "mode": "list",
+          "cachedResultName": "Youtube Sentiment ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_M67__2kGBUAjr9Cx6UEMkIk5xBNSqGnPI1IyLAdj3o/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 650226248,
+          "mode": "list",
+          "cachedResultName": "Video Stat",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_M67__2kGBUAjr9Cx6UEMkIk5xBNSqGnPI1IyLAdj3o/edit#gid=650226248"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Video Title": "={{  $('HTTP Video').item.json.items[0].snippet.title }}",
+            "ViewCount": "={{  $('HTTP Video').item.json.items[0].statistics.viewCount }}",
+            "LikeCount": "={{  $('HTTP Video').item.json.items[0].statistics.likeCount }}",
+            "CommentCount": "={{  $('HTTP Video').item.json.items[0].statistics.commentCount }}",
+            "PublishedAt": "={{ $('HTTP Video').item.json.items[0].snippet.publishedAt }}",
+            "VideoID": "={{ $('HTTP Video').item.json.items[0].id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "VideoID",
+              "displayName": "VideoID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Video Title",
+              "displayName": "Video Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PublishedAt",
+              "displayName": "PublishedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ViewCount",
+              "displayName": "ViewCount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LikeCount",
+              "displayName": "LikeCount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CommentCount",
+              "displayName": "CommentCount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        200,
+        -400
+      ],
+      "id": "7a6c5e5f-082e-41e6-ae10-8b639ba4bb77",
+      "name": "Google Sheets - Video Stat",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2iz4gIeEVhpATkM9",
+          "name": "Google Sheets account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1_M67__2kGBUAjr9Cx6UEMkIk5xBNSqGnPI1IyLAdj3o",
+          "mode": "list",
+          "cachedResultName": "Youtube Sentiment ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_M67__2kGBUAjr9Cx6UEMkIk5xBNSqGnPI1IyLAdj3o/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Comment",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_M67__2kGBUAjr9Cx6UEMkIk5xBNSqGnPI1IyLAdj3o/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "VideoID": "={{ $('Split Out - Comments').item.json.snippet.topLevelComment.snippet.videoId }}",
+            "Video Title": "={{ $('Loop Over Items').item.json.items[0].snippet.title }} ",
+            "Sentiment": "={{ $json.output.sentiment }}",
+            "Date": "={{ $now }}",
+            "Comment": "={{ $('HTTP Comment').item.json.items[0].snippet.topLevelComment.snippet.textDisplay }}"
+          },
+          "matchingColumns": [
+            "VideoID"
+          ],
+          "schema": [
+            {
+              "id": "VideoID",
+              "displayName": "VideoID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Video Title",
+              "displayName": "Video Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Comment",
+              "displayName": "Comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Sentiment",
+              "displayName": "Sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1440,
+        280
+      ],
+      "id": "01b6a050-29d3-402b-acb4-3263b1cb5180",
+      "name": "Google Sheets - Video Sentiment",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2iz4gIeEVhpATkM9",
+          "name": "Google Sheets account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "fieldsToMatchString": "VideoID",
+        "joinMode": "keepEverything",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        480,
+        -220
+      ],
+      "id": "bbc4d957-a006-4df3-b9e6-195d2548c283",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "content": "## Merge video Statistics, and sentiment Data",
+        "height": 300,
+        "width": 260
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        420,
+        -340
+      ],
+      "id": "6ca3e175-37ae-4ec1-a114-8911a06e8d7e",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## Inform Team -  Send the report ",
+        "height": 300,
+        "width": 260
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1480,
+        -340
+      ],
+      "id": "8b886d51-da53-4962-8348-2d31b573c942",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "## Automated YouTube Video Analytics & Sentiment Reporting System\n\n* Scheduled Trigger\n\n    The workflow runs daily or weekly based on requirements.\n\n* Get Videos List (HTTP Node)\n\n    Uses the YouTube API to fetch a list of videos from a channel within a specific timeframe.\n\n* For Each Video (HTTP Node)\n\n    Retrieves stats (likes, views, comments) and collects comments for sentiment analysis.\n\n* Statistics Saved (Database)\n\n    Stores video-level metrics in a database.\n\n* Sentiment Analysis (LLM)\n\n    Analyzes a set number of comments per video using a language model to label them as Positive, Negative, or Neutral.\n\n* Store Sentiment (Database)\n\n    Stores sentiment data alongside video IDs for deeper analysis.\n\n* Further Analysis (Custom Code Node)\n\n    Runs Python or JavaScript to calculate engagement/sentiment percentages.\n\n* Chart Report (HTTP)\n\n    Generates a visual report with video performance and sentiment stats.\n\n* Send Report (Telegram/Email/WhatsApp)\n\n    Sends the final report to selected channels (based on business needs).      ",
+        "height": 1160,
+        "width": 3480,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1440,
+        -600
+      ],
+      "id": "32260137-655a-4ea2-b797-4854b762dd53",
+      "name": "Sticky Note9"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Channel": {
+      "main": [
+        [
+          {
+            "node": "Split Out - Videos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Video": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets - Video Stat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Comment": {
+      "main": [
+        [
+          {
+            "node": "Split Out - Comments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out - Videos": {
+      "main": [
+        [
+          {
+            "node": "HTTP Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out - Comments": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Video Sentiment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "HTTP Comment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Video Sentiment": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Video Stat": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1e3b1eef-e5b6-4468-8cd1-61a69a1badc1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e84d69d57fe6f992415babdeb0ef9149c8d266dbc1f28068ed65ad8aae68949e"
+  },
+  "id": "4RYCF7l8MzA2yVTt",
+  "tags": []
+}
